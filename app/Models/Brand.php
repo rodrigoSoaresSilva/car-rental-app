@@ -8,6 +8,10 @@ class Brand extends Model
 {
     protected $fillable = ['name', 'image'];
 
+    public function vehicleModels(){
+        return $this->hasMany('App\Models\VehicleModel');
+    }
+
     /**
      * Get the validation rules for the model.
      *
@@ -19,7 +23,7 @@ class Brand extends Model
      */
     public function rules(): array {
         return [
-            'name' => 'required|unique:brands,name,'.$this->id,
+            'name' => 'required|unique:brands,name,'.$this->id.'|min:3',
             'image' => 'required|file|mimes:png'
         ];
     }
@@ -36,7 +40,10 @@ class Brand extends Model
     public function feedback(): array {
         return [
             'required' => 'The :attribute field is required.',
-            'name.unique' => 'The brand name already exists.'
+            'name.unique' => 'The brand name already exists.',
+            'name.min' => 'The brand name must be at least 3 characters long.',
+            'image.file' => 'The image must be a valid file.',
+            'image.mimes' => 'The image must be in PNG format.'
         ];
     }
 
