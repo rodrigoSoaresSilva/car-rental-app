@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Database\QueryException;
 
 class BrandController extends Controller
 {
@@ -63,9 +62,9 @@ class BrandController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Int $id)
+    public function show(int $id)
     {
-        $brand = $this->findOrFailWithResponse(Brand::class, $id, $this->notFoundMessage);
+        $brand = $this->findOrFailWithResponse(Brand::with('vehicleModels'), $id, $this->notFoundMessage);
         
         if ($brand instanceof JsonResponse) {
             return $brand;
@@ -91,8 +90,6 @@ class BrandController extends Controller
 
         $updated_brand = $request->validate($rules, $this->brand->feedback());
 
-        $updated_brand['name'] = null;
-
         if ($request->hasFile('image')) {
             $oldImage = $brand->image;
             $updated_brand['image'] = $request->file('image')->store($this->uploadImagePath, 'public');
@@ -111,7 +108,7 @@ class BrandController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Int $id)
+    public function destroy(int $id)
     {
         $brand = $this->findOrFailWithResponse(Brand::class, $id, $this->notFoundMessage);
         
@@ -125,6 +122,6 @@ class BrandController extends Controller
 
         Storage::disk('public')->delete($oldImage);
 
-        return response()->json(['message' => 'Brand removed with success.'], Response::HTTP_NO_CONTENT);
+        return response()->noContent();
     }
 }
