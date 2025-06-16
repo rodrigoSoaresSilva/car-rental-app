@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\VehicleModel;
+use App\Services\VehicleModelService;
 use App\Traits\HandlesModelNotFound;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -13,27 +14,23 @@ class VehicleModelController extends Controller
 {
     use HandlesModelNotFound;
 
-    private $vehicle_model;
+    private $vehicleModelService;
     private $uploadImagePath = 'images/vehicle_models';
     private $notFoundMessage = 'Vehicle Model not found.';
 
-    public function __construct(VehicleModel $vehicle_model){
-        $this->vehicle_model = $vehicle_model;
+    public function __construct(VehicleModelService $vehicleModelService)
+    {
+        $this->vehicleModelService = $vehicleModelService;
     }
 
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $vehicle_models = $this->vehicle_model->with('brand')->get();
+        $vehicle_models = $this->vehicleModelService->getVehicleModels($request);
 
-        return response()->json(
-            [
-                'data' => $vehicle_models
-            ],
-            Response::HTTP_OK
-        );
+        return response()->json($vehicle_models, Response::HTTP_OK);
     }
 
     /**
@@ -41,7 +38,7 @@ class VehicleModelController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate($this->vehicle_model->rules(), $this->vehicle_model->feedback());
+        $request->validate($this->vehicleModelService->vehicleModelRepository->model->rules(), $this->vehicleModelService->vehicleModelRepository->model->feedback());
 
         $image = $request->file('image');
         $imageUrn = $image->store($this->uploadImagePath, 'public');
@@ -58,7 +55,7 @@ class VehicleModelController extends Controller
 
         return response()->json(
             [
-                'data' => $this->vehicle_model->create($newVehicleModel)
+                'data' => $this->vehicleModelService->vehicleModelRepository->model->create($newVehicleModel)
             ],
             Response::HTTP_CREATED
         );
