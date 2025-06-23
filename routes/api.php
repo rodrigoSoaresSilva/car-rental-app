@@ -11,7 +11,7 @@ use App\Http\Controllers\AuthController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
-})->middleware('auth:sanctum');
+})->middleware('auth:api');
 
 Route::prefix('v1')->middleware('jwt.auth')->group(function () {
     Route::apiResources([
