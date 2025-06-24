@@ -22,6 +22,7 @@ import BrandsComponent from './components/Brands.vue';
 import InputContainerComponent from './components/InputContainer.vue';
 import TableComponent from './components/Table.vue';
 import CardComponent from './components/Card.vue';
+import ModalComponent from './components/Modal.vue';
 
 app.component('example-component', ExampleComponent);
 app.component('login-component', LoginComponent);
@@ -30,6 +31,7 @@ app.component('brands-component', BrandsComponent);
 app.component('input-container-component', InputContainerComponent);
 app.component('table-component', TableComponent);
 app.component('card-component', CardComponent);
+app.component('modal-component', ModalComponent);
 
 /**
  * The following block of code may be used to automatically register your

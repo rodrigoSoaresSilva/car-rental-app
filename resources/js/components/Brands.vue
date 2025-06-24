@@ -50,11 +50,54 @@
                         <table-component></table-component>
                     </template>
                     <template v-slot:footer>
-                        <button type="button" class="btn btn-primary btn-sm float-end">Add</button>
+                        <button type="button" class="btn btn-primary btn-sm float-end" data-bs-toggle="modal" data-bs-target="#modalBrand">Add</button>
                     </template>
                 </card-component>
             </div>
         </div>
+        <modal-component id="modalBrand" title="Add Brand">
+            <template v-slot:content>
+                <div class="row g-3 mb-3">
+                    <div class="col-12">
+                        <input-container-component
+                        title="Brand's name"
+                        id="inputNewBrandName"
+                        id-help="NewBrandNameHelp"
+                        text-help="Insert Brand's name"
+                        >
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="inputNewBrandName"
+                            aria-describedby="newBrandNameHelp"
+                            placeholder="Brand's name"
+                        >
+                        </input-container-component>
+                    </div>
+    
+                    <div class="col-12">
+                        <input-container-component
+                        title="Brand's logo"
+                        id="inputLogo"
+                        id-help="logoHelp"
+                        text-help="Select an image"
+                        >
+                        <input
+                            type="file"
+                            class="form-control"
+                            id="inputLogo"
+                            aria-describedby="logoHelp"
+                            placeholder="Brand's logo"
+                        >
+                        </input-container-component>
+                    </div>
+                </div>
+            </template>
+            <template v-slot:footer>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </template>
+        </modal-component>
     </div>
 </template>
 
