@@ -56,6 +56,12 @@
             </div>
         </div>
         <modal-component id="modalBrand" title="Add Brand">
+
+            <template v-slot:alerts>
+                <alert-component type="success" title="Brand created!" :details="detailsBrand" v-if="statusBrandTransaction == 'created'"></alert-component>
+                <alert-component type="danger" title="Fail when trying to create Brand!" :details="detailsBrand" v-if="statusBrandTransaction == 'error'"></alert-component>
+            </template>
+
             <template v-slot:content>
                 <div class="row g-3 mb-3">
                     <div class="col-12">
@@ -66,11 +72,12 @@
                         text-help="Insert Brand's name"
                         >
                         <input
-                            type="number"
+                            type="text"
                             class="form-control"
                             id="inputNewBrandName"
                             aria-describedby="newBrandNameHelp"
                             placeholder="Brand's name"
+                            v-model="brandName"
                         >
                         </input-container-component>
                     </div>
@@ -88,6 +95,7 @@
                             id="inputLogo"
                             aria-describedby="logoHelp"
                             placeholder="Brand's logo"
+                            @change="uploadImage($event)"
                         >
                         </input-container-component>
                     </div>
@@ -95,12 +103,64 @@
             </template>
             <template v-slot:footer>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-primary" @click="saveBrand()">Save changes</button>
             </template>
         </modal-component>
     </div>
 </template>
 
 <script>
-    
+    export default {
+        data() {
+            return {
+                urlBase: 'http://127.0.0.1:8000/api/v1/brand',
+                brandName: '',
+                brandLogo: [],
+                statusBrandTransaction: '',
+                detailsBrand: {},
+            }
+        },
+        computed: {
+            token(){
+                let cookie = document.cookie.split(';').find(index => {
+                    return index.includes('token=');;
+                });
+
+                let token = cookie.split('=');
+
+                return 'Bearer ' + token[1];
+            },
+        },
+        methods: {
+            uploadImage(e){
+                this.brandLogo = e.target.files
+            },
+            saveBrand(){
+                let config = {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': this.token
+                    }
+                }
+
+                let formData = new FormData();
+                formData.append('name', this.brandName);
+                formData.append('image', this.brandLogo[0]);
+
+                axios.post(this.urlBase, formData, config)
+                    .then(response => {
+                        this.statusBrandTransaction = 'created';
+                        this.detailsBrand = {
+                            message: 'Brand ID: ' + response.data.id
+                        }
+                    })
+                    .catch(errors => {
+                        this.statusBrandTransaction = 'error';
+                        this.detailsBrand = {
+                            data: errors.response.data.errors
+                        }
+                    });
+            }
+        }
+    }
 </script>
