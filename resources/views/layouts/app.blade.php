@@ -36,23 +36,23 @@
                     <ul class="navbar-nav me-auto">
                         @auth
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Clientes</a>
+                                <a class="nav-link" href="#">Clients</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Locações</a>
+                                <a class="nav-link" href="#">Rent</a>
                             </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                     aria-expanded="false">
-                                    Veículos
+                                    Vehicles
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Carros</a></li>
+                                    <li><a class="dropdown-item" href="#">Cars</a></li>
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
-                                    <li><a class="dropdown-item" href="#">Marcas</a></li>
-                                    <li><a class="dropdown-item" href="#">Modelos</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('brands') }}">Brands</a></li>
+                                    <li><a class="dropdown-item" href="#">Models</a></li>
                                 </ul>
                             </li>
 
