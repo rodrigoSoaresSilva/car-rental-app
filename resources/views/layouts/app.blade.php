@@ -99,6 +99,33 @@
             </div>
         </nav>
 
+        @auth
+            <nav aria-label="breadcrumb" class="navbar navbar-expand-md mt-2">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('home') }}">
+                                Home
+                            </a>
+                        </li>
+
+                        @php
+                            $routeParts = explode('.', Route::currentRouteName());
+                            $breadcrumb = collect($routeParts)
+                                ->map(function ($part) {
+                                    return ucfirst(str_replace('-', ' ', $part));
+                                })
+                                ->join(' > ');
+                        @endphp
+
+                        <li class="breadcrumb-item active" aria-current="page">
+                            {{ $breadcrumb }}
+                        </li>
+                    </ol>
+                </div>
+            </nav>
+        @endauth
+
         <main class="py-4">
             @yield('content')
         </main>

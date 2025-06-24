@@ -1,11 +1,9 @@
 <template>
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">Brand's search</div>
-
-                    <div class="card-body">
+            <div class="col-md-8 mb-3">
+                <card-component title="Brand's search">
+                    <template v-slot:content>
                         <div class="row g-3 mb-3">
                             <div class="col">
                                 <input-container-component
@@ -41,11 +39,20 @@
                                 </input-container-component>
                             </div>
                         </div>
-                    </div>
-                    <div class="card-footer">
+                    </template>
+                    <template v-slot:footer>
                         <button type="submit" class="btn btn-primary btn-sm float-end">Search</button>
-                    </div>
-                </div>
+                    </template>
+                </card-component>
+
+                <card-component title="Brands">
+                    <template v-slot:content>
+                        <table-component></table-component>
+                    </template>
+                    <template v-slot:footer>
+                        <button type="button" class="btn btn-primary btn-sm float-end">Add</button>
+                    </template>
+                </card-component>
             </div>
         </div>
     </div>
