@@ -47,7 +47,14 @@
 
                 <card-component title="Brands">
                     <template v-slot:content>
-                        <table-component></table-component>
+                        <table-component
+                            :data="brands"
+                            :titles="{
+                                id: {title: 'ID', type: 'text'},
+                                name: {title: 'Name', type: 'text'},
+                                image: {title: 'Logo', type: 'image'}
+                            }">
+                                </table-component>
                     </template>
                     <template v-slot:footer>
                         <button type="button" class="btn btn-primary btn-sm float-end" data-bs-toggle="modal" data-bs-target="#modalBrand">Add</button>
@@ -110,6 +117,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
     export default {
         data() {
             return {
@@ -118,6 +127,7 @@
                 brandLogo: [],
                 statusBrandTransaction: '',
                 detailsBrand: {},
+                brands: [],
             }
         },
         computed: {
@@ -132,6 +142,20 @@
             },
         },
         methods: {
+            getBrands(){
+                let config = {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': this.token
+                    }
+                }
+
+                axios.get(this.urlBase, config)
+                .then(response => {
+                    this.brands = response.data.data;
+                })
+                .catch(errors => {console.log(errors)})
+            },
             uploadImage(e){
                 this.brandLogo = e.target.files
             },
@@ -161,6 +185,9 @@
                         }
                     });
             }
+        },
+        mounted(){
+            this.getBrands()
         }
     }
 </script>
