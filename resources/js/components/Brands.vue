@@ -48,7 +48,7 @@
                 <card-component title="Brands">
                     <template v-slot:content>
                         <table-component
-                            :data="brands"
+                            :data="brands.data"
                             :titles="{
                                 id: {title: 'ID', type: 'text'},
                                 name: {title: 'Name', type: 'text'},
@@ -57,7 +57,18 @@
                                 </table-component>
                     </template>
                     <template v-slot:footer>
-                        <button type="button" class="btn btn-primary btn-sm float-end" data-bs-toggle="modal" data-bs-target="#modalBrand">Add</button>
+                        <div class="row">
+                            <div class="col-10">
+                                <pagination-component>
+                                    <li v-for="link, key in brands.links" :key="key" :class="link.active ? 'page-item active' : 'page-item'" @click="paginate(link)">
+                                        <a class="page-link" v-html="link.label"></a>
+                                    </li>
+                                </pagination-component>
+                            </div>
+                            <div class="col">
+                                <button type="button" class="btn btn-primary btn-sm float-end" data-bs-toggle="modal" data-bs-target="#modalBrand">Add</button>
+                            </div>
+                        </div>
                     </template>
                 </card-component>
             </div>
@@ -127,7 +138,7 @@ import axios from 'axios';
                 brandLogo: [],
                 statusBrandTransaction: '',
                 detailsBrand: {},
-                brands: [],
+                brands: {data: []},
             }
         },
         computed: {
@@ -184,7 +195,13 @@ import axios from 'axios';
                             data: errors.response.data.errors
                         }
                     });
-            }
+            },
+            paginate(link){
+                if(link.url){
+                    this.urlBase = link.url;
+                    this.getBrands();
+                }
+            },
         },
         mounted(){
             this.getBrands()

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
+use App\Services\BrandService;
 use App\Traits\HandlesModelNotFound;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -13,20 +14,21 @@ class BrandController extends Controller
 {
     use HandlesModelNotFound;
 
-    private $brand;
+    private $brandService;
     private $uploadImagePath = 'images/brands';
     private $notFoundMessage = 'Brand not found.';
 
-    public function __construct(Brand $brand){
-        $this->brand = $brand;
+    public function __construct(BrandService $brandService)
+    {
+        $this->brandService = $brandService;
     }
 
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $brands = $this->brand->all();
+        $brands = $this->brandService->getBrandsPaginated($request);
 
         return response()->json(
             [
