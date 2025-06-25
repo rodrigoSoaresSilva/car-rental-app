@@ -4,6 +4,8 @@ namespace App\Repositories;
 
 use App\Interfaces\Repository\BaseRepositoryInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 abstract class BaseRepository implements BaseRepositoryInterface
 {
@@ -32,5 +34,15 @@ abstract class BaseRepository implements BaseRepositoryInterface
     public function remove(int $id): bool
     {
         return $this->model->whereId($id)->destroy();
+    }
+
+    public function getAll(): Collection
+    {
+        return $this->model->all();
+    }
+
+    public function getPaginated(int $perPage): LengthAwarePaginator
+    {
+        return $this->model->paginate($perPage);
     }
 }
