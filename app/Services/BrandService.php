@@ -2,27 +2,28 @@
 
 namespace App\Services;
 
-use App\Models\Brand;
 use App\Repositories\BrandRepository;
+use App\Services\BaseService;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
-class BrandService
+class BrandService extends BaseService
 {
-    public $brandRepository;
-
     public function __construct(BrandRepository $brandRepository)
     {
-        $this->brandRepository = $brandRepository;
+        parent::__construct($brandRepository);
     }
 
-    public function getBrands()
+    public function getAllBrands(): Collection
     {
-        return $this->brandRepository->getAll();
+        return $this->repository->getAll();
     }
 
-    public function getBrandsPaginated(Request $request)
+    public function getBrandsPaginated(Request $request): LengthAwarePaginator
     {
-        $perPage = $request->input('per_page', 3);
-        return $this->brandRepository->getPaginated($perPage);
+        $query = $this->getNewQuery();
+
+        return $this->getPaginated($query, $request);
     }
 }
