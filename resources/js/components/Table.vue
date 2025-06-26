@@ -3,6 +3,7 @@
         <thead>
             <tr>
                 <th v-for="title, key in titles" :key="key" scope="col">{{ title.title }}</th>
+                <th v-if="open || update || remove"></th>
             </tr>
         </thead>
         <tbody>
@@ -15,6 +16,11 @@
                         <img :src="'/storage/' + obj[key]" width="30" height="30" alt="logo">
                     </span>
                 </td>
+                <td v-if="open || update || remove">
+                    <button v-if="open" class="btn btn-outline-success btn-sm">Open</button>
+                    <button v-if="update" class="btn btn-outline-primary btn-sm">Edit</button>
+                    <button v-if="remove" class="btn btn-outline-danger btn-sm">Remove</button>
+                </td>
             </tr>
         </tbody>
     </table>
@@ -22,6 +28,6 @@
 
 <script>
     export default {
-        props: ['data', 'titles']
+        props: ['data', 'titles', 'open', 'update', 'remove']
     }
 </script>
