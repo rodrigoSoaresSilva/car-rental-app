@@ -18,6 +18,7 @@
                                     id="inputID"
                                     aria-describedby="idHelp"
                                     placeholder="ID"
+                                    v-model="search.id"
                                 >
                                 </input-container-component>
                             </div>
@@ -35,13 +36,14 @@
                                     id="inputName"
                                     aria-describedby="nameHelp"
                                     placeholder="Brand's name"
+                                    v-model="search.name"
                                 >
                                 </input-container-component>
                             </div>
                         </div>
                     </template>
                     <template v-slot:footer>
-                        <button type="submit" class="btn btn-primary btn-sm float-end">Search</button>
+                        <button type="submit" class="btn btn-primary btn-sm float-end" @click="searchBrand()">Search</button>
                     </template>
                 </card-component>
 
@@ -49,12 +51,15 @@
                     <template v-slot:content>
                         <table-component
                             :data="brands.data"
+                            :open="true"
+                            :update="true"
+                            :remove="true"
                             :titles="{
                                 id: {title: 'ID', type: 'text'},
                                 name: {title: 'Name', type: 'text'},
                                 image: {title: 'Logo', type: 'image'}
                             }">
-                                </table-component>
+                        </table-component>
                     </template>
                     <template v-slot:footer>
                         <div class="row">
@@ -134,11 +139,14 @@ import axios from 'axios';
         data() {
             return {
                 urlBase: 'http://127.0.0.1:8000/api/v1/brand',
+                urlPagination: '',
+                urlFilter: '',
                 brandName: '',
                 brandLogo: [],
                 statusBrandTransaction: '',
                 detailsBrand: {},
                 brands: {data: []},
+                search: { id: '', name: '' },
             }
         },
         computed: {
@@ -154,6 +162,7 @@ import axios from 'axios';
         },
         methods: {
             getBrands(){
+                let url = this.urlBase + '?' + this.urlPagination + this.urlFilter;
                 let config = {
                     headers: {
                         'Accept': 'application/json',
@@ -161,7 +170,7 @@ import axios from 'axios';
                     }
                 }
 
-                axios.get(this.urlBase, config)
+                axios.get(url, config)
                 .then(response => {
                     this.brands = response.data.data;
                 })
@@ -198,9 +207,31 @@ import axios from 'axios';
             },
             paginate(link){
                 if(link.url){
-                    this.urlBase = link.url;
+                    this.urlPagination = link.url.split('?')[1];
                     this.getBrands();
                 }
+            },
+            searchBrand(){
+                let filter = '';
+
+                for(let key in this.search){
+                    if(this.search[key]){
+                        if(filter != ''){
+                            filter += ";";
+                        }
+
+                        filter += key + ':like:' + this.search[key];
+                    }
+                }
+
+                if(filter != ''){
+                    this.urlPagination = 'page=1';
+                    this.urlFilter = '&filters=' + filter;
+                } else {
+                    this.urlFilter = '';
+                }
+
+                this.getBrands();
             },
         },
         mounted(){
