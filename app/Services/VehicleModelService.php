@@ -4,19 +4,21 @@ namespace App\Services;
 
 use App\Models\Brand;
 use App\Repositories\VehicleModelRepository;
+use App\Services\BaseService;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
-class VehicleModelService
+class VehicleModelService extends BaseService
 {
-    public $vehicleModelRepository;
-
     public function __construct(VehicleModelRepository $vehicleModelRepository)
     {
-        $this->vehicleModelRepository = $vehicleModelRepository;
+        parent::__construct($vehicleModelRepository);
     }
 
-    public function getVehicleModels(Request $request)
+    public function getVehicleModels(Request $request): LengthAwarePaginator
     {
+        $query = $this->getNewQuery();
+        
         if ($request->filled('brand_fields')) {
             $brandFields = explode(',', $request->get('brand_fields'));
 
@@ -29,35 +31,12 @@ class VehicleModelService
                     $safeBrandFields[] = 'id';
                 }
 
-                $this->vehicleModelRepository->setWithRelationshipFields('brand', $safeBrandFields);
+                $this->setWithRelationshipFields($query, 'brand', $safeBrandFields);
             }
         } else {
-            $this->vehicleModelRepository->setWithRelationship('brand');
+            $this->setWithRelationship($query, 'brand');
         }
 
-        // Allow selecting specific columns for the main model
-        if ($request->filled('fields')) {
-            $fields = explode(',', $request->get('fields'));
-            $safeFields = array_intersect($fields, $this->vehicleModelRepository->model->getFillable());
-
-            if (!empty($safeFields)) {
-                if (!in_array('id', $safeFields)) {
-                    $safeFields[] = 'id';
-                }
-
-                $this->vehicleModelRepository->setSpecificFields($safeFields);
-            }
-        }
-
-        // Apply dynamic filters using where conditions
-        if ($request->filled('filters')) {
-            $filters = explode(',', $request->get('filters'));
-
-            $this->vehicleModelRepository->setWithFilter($filters);
-        }
-
-        $perPage = $request->input('per_page', 10);
-
-        return $this->vehicleModelRepository->getModelsPaginated($perPage);
+        return $this->getPaginated($query, $request);
     }
 }
