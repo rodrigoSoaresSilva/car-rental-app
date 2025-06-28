@@ -6,6 +6,16 @@
 
 import './bootstrap';
 import { createApp } from 'vue';
+import { createStore } from 'vuex';
+
+const store = createStore({
+  state () {
+    return {
+      item: {},
+      transaction: {status: '', message: '', data: ''},
+    }
+  },
+})
 
 /**
  * Next, we will create a fresh Vue application instance. You may then begin
@@ -36,6 +46,8 @@ app.component('card-component', CardComponent);
 app.component('modal-component', ModalComponent);
 app.component('alert-component', AlertComponent);
 app.component('pagination-component', PaginationComponent);
+
+app.use(store);
 
 /**
  * The following block of code may be used to automatically register your
