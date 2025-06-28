@@ -57,7 +57,8 @@
                             :titles="{
                                 id: {title: 'ID', type: 'text'},
                                 name: {title: 'Name', type: 'text'},
-                                image: {title: 'Logo', type: 'image'}
+                                image: {title: 'Logo', type: 'image'},
+                                created_at: {title: 'Created At', type: 'date'},
                             }">
                         </table-component>
                     </template>
@@ -149,7 +150,7 @@
                 </input-container-component>
 
                 <input-container-component title="Creation date">
-                    <input type="text" class="form-control" :value="$store.state.item.created_at" disabled>
+                    <input type="date" class="form-control" :value="getFormattedDate($store.state.item.created_at)" disabled>
                 </input-container-component>
             </template>
             <template v-slot:footer>
@@ -212,7 +213,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+    import axios from 'axios';
+    import { formatToDateInput } from '@/utils/date';
 
     export default {
         data() {
@@ -240,6 +242,9 @@ import axios from 'axios';
             },
         },
         methods: {
+            getFormattedDate(dateString){
+                return formatToDateInput(dateString);
+            },
             getBrands(){
                 let url = this.urlBase + '?' + this.urlPagination + this.urlFilter;
                 let config = {

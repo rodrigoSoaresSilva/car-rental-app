@@ -9,10 +9,13 @@
         <tbody>
             <tr v-for="(obj, index) in data" :key="index">
                 <td v-for="(value, key) in titles" :key="value.title + '-' + key">
-                    <span v-if="value.type !== 'image'">
+                    <span v-if="value.type == 'text'">
                         {{ obj[key] }}
                     </span>
-                    <span v-else>
+                    <span v-if="value.type == 'date'">
+                        {{ formatDateTime(obj[key]) }}
+                    </span>
+                    <span v-if="value.type == 'image'">
                         <img :src="'/storage/' + obj[key]" width="30" height="30" alt="logo">
                     </span>
                 </td>
@@ -25,6 +28,10 @@
         </tbody>
     </table>
 </template>
+
+<script setup>
+    import { formatDateTime } from '@/utils/date';
+</script>
 
 <script>
     export default {
