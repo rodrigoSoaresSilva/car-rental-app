@@ -90,7 +90,7 @@ class BrandController extends Controller
                             ? collect($brand->rules())->only(array_keys($request->all()))->all()
                             : $brand->rules();
 
-        $updated_brand = $request->validate($rules, $this->brand->feedback());
+        $updated_brand = $request->validate($rules, $brand->feedback());
 
         if ($request->hasFile('image')) {
             $oldImage = $brand->image;

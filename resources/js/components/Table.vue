@@ -3,7 +3,7 @@
         <thead>
             <tr>
                 <th v-for="title, key in titles" :key="key" scope="col">{{ title.title }}</th>
-                <th v-if="open || update || remove"></th>
+                <th v-if="open.visible || update.visible || remove.visible"></th>
             </tr>
         </thead>
         <tbody>
@@ -16,10 +16,10 @@
                         <img :src="'/storage/' + obj[key]" width="30" height="30" alt="logo">
                     </span>
                 </td>
-                <td v-if="open || update || remove">
-                    <button v-if="open" class="btn btn-outline-success btn-sm">Open</button>
-                    <button v-if="update" class="btn btn-outline-primary btn-sm">Edit</button>
-                    <button v-if="remove" class="btn btn-outline-danger btn-sm">Remove</button>
+                <td v-if="open.visible || update.visible || remove.visible">
+                    <button v-if="open.visible" class="btn btn-outline-success btn-sm" :data-bs-toggle="open.dataToggle" :data-bs-target="open.dataTarget" @click="setStore(obj)">Open</button>
+                    <button v-if="update.visible" class="btn btn-outline-primary btn-sm" :data-bs-toggle="update.dataToggle" :data-bs-target="update.dataTarget" @click="setStore(obj)">Edit</button>
+                    <button v-if="remove.visible" class="btn btn-outline-danger btn-sm" :data-bs-toggle="remove.dataToggle" :data-bs-target="remove.dataTarget" @click="setStore(obj)">Remove</button>
                 </td>
             </tr>
         </tbody>
@@ -28,6 +28,14 @@
 
 <script>
     export default {
-        props: ['data', 'titles', 'open', 'update', 'remove']
+        props: ['data', 'titles', 'open', 'update', 'remove'],
+        methods: {
+            setStore(obj) {
+                this.$store.state.transaction.status = '';
+                this.$store.state.transaction.message = '';
+                this.$store.state.transaction.data = '';
+                this.$store.state.item = obj;
+            }
+        }
     }
 </script>

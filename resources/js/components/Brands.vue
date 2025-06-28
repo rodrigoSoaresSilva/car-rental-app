@@ -51,9 +51,9 @@
                     <template v-slot:content>
                         <table-component
                             :data="brands.data"
-                            :open="true"
-                            :update="true"
-                            :remove="true"
+                            :open="{visible: true, dataToggle: 'modal', dataTarget: '#modalOpenBrand'}"
+                            :update="{visible: true, dataToggle: 'modal', dataTarget: '#modalUpdateBrand'}"
+                            :remove="{visible: true, dataToggle: 'modal', dataTarget: '#modalRemoveBrand'}"
                             :titles="{
                                 id: {title: 'ID', type: 'text'},
                                 name: {title: 'Name', type: 'text'},
@@ -71,14 +71,16 @@
                                 </pagination-component>
                             </div>
                             <div class="col">
-                                <button type="button" class="btn btn-primary btn-sm float-end" data-bs-toggle="modal" data-bs-target="#modalBrand">Add</button>
+                                <button type="button" class="btn btn-primary btn-sm float-end" data-bs-toggle="modal" data-bs-target="#modalCreateBrand">Add</button>
                             </div>
                         </div>
                     </template>
                 </card-component>
             </div>
         </div>
-        <modal-component id="modalBrand" title="Add Brand">
+
+        <!-- start modal create brand -->
+        <modal-component id="modalCreateBrand" title="Add Brand">
 
             <template v-slot:alerts>
                 <alert-component type="success" title="Brand created!" :details="detailsBrand" v-if="statusBrandTransaction == 'created'"></alert-component>
@@ -89,7 +91,7 @@
                 <div class="row g-3 mb-3">
                     <div class="col-12">
                         <input-container-component
-                        title="Brand's name"
+                        title="Name"
                         id="inputNewBrandName"
                         id-help="NewBrandNameHelp"
                         text-help="Insert Brand's name"
@@ -107,7 +109,7 @@
     
                     <div class="col-12">
                         <input-container-component
-                        title="Brand's logo"
+                        title="Logo"
                         id="inputLogo"
                         id-help="logoHelp"
                         text-help="Select an image"
@@ -129,6 +131,83 @@
                 <button type="button" class="btn btn-primary" @click="saveBrand()">Save changes</button>
             </template>
         </modal-component>
+        <!-- end modal create brand -->
+
+        <!-- start modal open brand -->
+        <modal-component id="modalOpenBrand" title="Brand Details">
+            <template v-slot:content>
+                <input-container-component title="ID">
+                    <input type="text" class="form-control" :value="$store.state.item.id" disabled>
+                </input-container-component>
+
+                <input-container-component title="Name">
+                    <input type="text" class="form-control" :value="$store.state.item.name" disabled>
+                </input-container-component>
+
+                <input-container-component title="">
+                    <img :src="'storage/'+$store.state.item.image" v-if="$store.state.item.image">
+                </input-container-component>
+
+                <input-container-component title="Creation date">
+                    <input type="text" class="form-control" :value="$store.state.item.created_at" disabled>
+                </input-container-component>
+            </template>
+            <template v-slot:footer>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </template>
+        </modal-component>
+        <!-- end modal open brand -->
+
+        <!-- start modal remove brand -->
+        <modal-component id="modalRemoveBrand" title="Remove Brand">
+            <template v-slot:alerts>
+                <alert-component type="success" title="Operation succeed!" :details="$store.state.transaction" v-if="$store.state.transaction.status == 'success'"></alert-component>
+                <alert-component type="danger" title="Operation error!" :details="$store.state.transaction" v-if="$store.state.transaction.status == 'error'"></alert-component>
+            </template>
+            <template v-slot:content v-if="$store.state.transaction.status != 'success'">
+                <input-container-component title="ID">
+                    <input type="text" class="form-control" :value="$store.state.item.id" disabled>
+                </input-container-component>
+
+                <input-container-component title="Name">
+                    <input type="text" class="form-control" :value="$store.state.item.name" disabled>
+                </input-container-component>
+            </template>
+            <template v-slot:footer>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" @click="remove()" v-if="$store.state.transaction.status != 'success'">Remove</button>
+            </template>
+        </modal-component>
+        <!-- end modal remove brand -->
+
+        <!-- start modal update brand -->
+        <modal-component id="modalUpdateBrand" title="Edit Brand">
+
+            <template v-slot:alerts>
+                <alert-component type="success" title="Operation succeed!" :details="$store.state.transaction" v-if="$store.state.transaction.status == 'success'"></alert-component>
+                <alert-component type="danger" title="Operation error!" :details="$store.state.transaction" v-if="$store.state.transaction.status == 'error'"></alert-component>
+            </template>
+
+            <template v-slot:content>
+                <div class="form-group">
+                    <input-container-component title="Name" id="updateName" id-help="updateNameHelp" text-help="Insert Brand's name">
+                        <input type="text" class="form-control" id="updateName" aria-describedby="updateNameHelp" placeholder="Brand's name" v-model="$store.state.item.name">
+                    </input-container-component>
+                </div>
+
+                <div class="form-group">
+                    <input-container-component title="Logo" id="updateImage" id-help="updateImageHelp" text-help="Select an image in PNG format">
+                        <input type="file" class="form-control" id="updateImage" aria-describedby="updateImageHelp" placeholder="Select an image" @change="uploadImage($event)">
+                    </input-container-component>
+                </div>
+            </template>
+
+            <template v-slot:footer>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" @click="update()">Update</button>
+            </template>
+        </modal-component>
+        <!-- end modal update brand -->
     </div>
 </template>
 
@@ -232,6 +311,68 @@ import axios from 'axios';
                 }
 
                 this.getBrands();
+            },
+            remove(){
+                let confirmation = confirm('Do you want to remove this brand?');
+                
+                if(!confirmation) return false;
+
+                let url = this.urlBase + '/' + this.$store.state.item.id;
+
+                let formData = new FormData();
+                formData.append('_method', 'delete');
+
+                let config = {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': this.token
+                    }
+                }
+
+                axios.post(url, formData, config)
+                    .then(response => {
+                        this.$store.state.transaction.status = 'success';
+                        this.$store.state.transaction.message = 'Brand removed with success!';
+
+                        this.getBrands();
+                    })
+                    .catch(errors => {
+                        this.$store.state.transaction = {
+                            status: 'error',
+                            data: errors.response.data.errors,
+                        }
+                    });
+            },
+            update(){
+                let url = this.urlBase + '/' + this.$store.state.item.id;
+
+                let formData = new FormData();
+                formData.append('_method', 'patch');
+                formData.append('name', this.$store.state.item.name);
+
+                if (this.brandLogo[0]) formData.append('image', this.brandLogo[0]);
+
+                let config = {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': this.token
+                    }
+                }
+
+                axios.post(url, formData, config)
+                    .then(response => {
+                        this.$store.state.transaction.status = 'success';
+                        this.$store.state.transaction.message = 'Brand updated with success!';
+
+                        updateImage.value = '';
+                        this.getBrands();
+                    })
+                    .catch(errors => {
+                        this.$store.state.transaction = {
+                            status: 'error',
+                            data: errors.response.data.errors,
+                        }
+                    });
             },
         },
         mounted(){
