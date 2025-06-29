@@ -230,31 +230,14 @@
                 search: { id: '', name: '' },
             }
         },
-        computed: {
-            token(){
-                let cookie = document.cookie.split(';').find(index => {
-                    return index.includes('token=');;
-                });
-
-                let token = cookie.split('=');
-
-                return 'Bearer ' + token[1];
-            },
-        },
         methods: {
             getFormattedDate(dateString){
                 return formatToDateInput(dateString);
             },
             getBrands(){
                 let url = this.urlBase + '?' + this.urlPagination + this.urlFilter;
-                let config = {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Authorization': this.token
-                    }
-                }
 
-                axios.get(url, config)
+                axios.get(url)
                 .then(response => {
                     this.brands = response.data.data;
                 })
@@ -264,18 +247,11 @@
                 this.brandLogo = e.target.files
             },
             saveBrand(){
-                let config = {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Authorization': this.token
-                    }
-                }
-
                 let formData = new FormData();
                 formData.append('name', this.brandName);
                 formData.append('image', this.brandLogo[0]);
 
-                axios.post(this.urlBase, formData, config)
+                axios.post(this.urlBase, formData)
                     .then(response => {
                         this.statusBrandTransaction = 'created';
                         this.detailsBrand = {
@@ -327,14 +303,7 @@
                 let formData = new FormData();
                 formData.append('_method', 'delete');
 
-                let config = {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Authorization': this.token
-                    }
-                }
-
-                axios.post(url, formData, config)
+                axios.post(url, formData)
                     .then(response => {
                         this.$store.state.transaction.status = 'success';
                         this.$store.state.transaction.message = 'Brand removed with success!';
@@ -357,14 +326,7 @@
 
                 if (this.brandLogo[0]) formData.append('image', this.brandLogo[0]);
 
-                let config = {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Authorization': this.token
-                    }
-                }
-
-                axios.post(url, formData, config)
+                axios.post(url, formData)
                     .then(response => {
                         this.$store.state.transaction.status = 'success';
                         this.$store.state.transaction.message = 'Brand updated with success!';

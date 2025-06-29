@@ -32,3 +32,39 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 //     forceTLS: (import.meta.env.VITE_PUSHER_SCHEME ?? 'https') === 'https',
 //     enabledTransports: ['ws', 'wss'],
 // });
+axios.interceptors.request.use(
+    config => {
+        let cookie = document.cookie.split(';').find(index => {
+            return index.includes('token=');;
+        });
+
+        let token = 'Bearer ' + cookie.split('=')[1];
+
+        config.headers.Authorization = token;
+        config.headers['Accept'] = 'application/json';
+
+        return config;
+    },
+    error => {
+        return Promise.reject(error);
+    },
+);
+
+axios.interceptors.response.use(
+    response => {
+        return response;
+    },
+    error => {
+        if(error.response.status == 401 && error.response.data.message == 'Token has expired'){
+            axios.post('http://127.0.0.1:8000/api/refresh')
+                .then(response => response.json())
+                    .then(data => {
+                        if(data.token){
+                            document.cookie = 'token='+data.token+';SameSite=Lax';
+                            window.location.reload();
+                        }
+                    });
+        }
+        return Promise.reject(error);
+    },
+);
